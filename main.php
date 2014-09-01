@@ -4,8 +4,61 @@ include('resources/board-creator/board-creator.php');
 
 date_default_timezone_set('UTC');
 
-function addMove(&$pdf, $key, $move) {
+function addMove(&$pdf, $key, $move, $next) {
+	// round evals and convert to millimeters, scaling to a max val of 19mm
 	if($key%2==0) {
+		// White's move
+
+		// Advantage line
+		if (isset($next['eval'])) {
+			$nextEval = ($next['eval'] > 1000)? 1000 : (($next['eval'] < -1000)? -1000 : $next['eval']);
+			$nextEval = 19*($nextEval / 1000);
+		}
+		if (isset($move['eval'])) {
+			$curEval = ($move['eval'] > 1000)? 1000 : (($move['eval'] < -1000)? -1000 : $move['eval']);
+			$curEval = 19*($curEval / 1000);
+		}
+		if (isset($next['mate'])) {
+			$nextEval = ($next['mate'] > 0)? 19 : -19;
+		}
+		if (isset($move['mate'])) {
+			$curEval = ($move['mate'] > 0)? 19 : -19;
+		}
+
+		$pdf->SetLineWidth(0.5);
+		$pdf->SetDrawColor(230);
+		$x = $pdf->GetX();
+		$y = $pdf->GetY();
+
+		if (isset($curEval)) {
+			if ($curEval >= 0) {
+				$pdf->Line($x+28.75, $y+0.25, $x+28.75-$curEval, $y+0.25);
+				$pdf->Line($x+28.75, $y+0.75, $x+28.75-$curEval, $y+0.75);
+				$pdf->Line($x+28.75, $y+1.25, $x+28.75-$curEval, $y+1.25);
+				$pdf->Line($x+28.75, $y+1.75, $x+28.75-$curEval, $y+1.75);
+			} else {
+				$pdf->Line($x+29.25, $y+0.25, $x+29.25-$curEval, $y+0.25);
+				$pdf->Line($x+29.25, $y+0.75, $x+29.25-$curEval, $y+0.75);
+				$pdf->Line($x+29.25, $y+1.25, $x+29.25-$curEval, $y+1.25);
+				$pdf->Line($x+29.25, $y+1.75, $x+29.25-$curEval, $y+1.75);
+			}
+		}
+		if (isset($nextEval)) {
+			if ($nextEval >= 0) {
+				$pdf->Line($x+28.75, $y+2.25, $x+28.75-$nextEval, $y+2.25);
+				$pdf->Line($x+28.75, $y+2.75, $x+28.75-$nextEval, $y+2.75);
+				$pdf->Line($x+28.75, $y+3.25, $x+28.75-$nextEval, $y+3.25);
+				$pdf->Line($x+28.75, $y+3.75, $x+28.75-$nextEval, $y+3.75);
+			} else {
+				$pdf->Line($x+29.25, $y+2.25, $x+29.25-$nextEval, $y+2.25);
+				$pdf->Line($x+29.25, $y+2.75, $x+29.25-$nextEval, $y+2.75);
+				$pdf->Line($x+29.25, $y+3.25, $x+29.25-$nextEval, $y+3.25);
+				$pdf->Line($x+29.25, $y+3.75, $x+29.25-$nextEval, $y+3.75);
+			}
+		}
+
+		$pdf->SetLineWidth(0.2);
+		
 		$pdf->SetDrawColor(190);
 		$pdf->SetFillColor(190);
 		$pdf->SetTextColor(255);
@@ -14,34 +67,36 @@ function addMove(&$pdf, $key, $move) {
 
 		$pdf->SetTextColor(0);
 		$pdf->SetFont('Arial','',10);
-		$pdf->Cell(12,4,$move['move'],'LB',0,'L');
+		$pdf->Cell(12,4,$move['move'],'LTB',0,'L');
 
 		if(isset($move['variation']) || isset($move['result'])) {
 			$pdf->SetFont('Arial','B',7);
 		} else {
 			$pdf->SetFont('Arial','',7);
 		}
-
-		if(isset($move['eval'])){
+		
+		if (isset($move['result'])) {
+			$pdf->Cell(8,4,$move['result'],'TBR',0,'R');
+		} else if(isset($move['eval'])){
 			$tmp = sprintf('%+3.2f',$move['eval']/100);
 			if(strlen($tmp) == 7) {
 				$tmp = substr($tmp,0,4);
 			} else {
 				$tmp = substr($tmp,0,5);
 			}
-			$pdf->Cell(8,4,$tmp,'B',0,'R',isset($move['variation'])? 1 : 0);
+			$pdf->Cell(8,4,$tmp,'TB',0,'R',isset($move['variation'])? 1 : 0);
 		} else if (isset($move['mate'])) {
-			$pdf->Cell(8,4,'# '.$move['mate'],'B',0,'R',isset($move['variation'])? 1 : 0);
-		} else if (isset($move['result'])) {
-			$pdf->Cell(8,4,$move['result'],'BR',1,'R');
+			$pdf->Cell(8,4,'# '.$move['mate'],'TB',0,'R',isset($move['variation'])? 1 : 0);
 		} else {
-			$pdf->Cell(8,4,'','BR',1);
+			$pdf->Cell(8,4,'','TBR',0);
 		}
 	} else {
+		$pdf->SetLineWidth(0.2);
+
 		$pdf->SetDrawColor(190);
 		$pdf->SetTextColor(0);
 		$pdf->SetFont('Arial','',10);
-		$pdf->Cell(12,4,$move['move'],'LB',0,'L');
+		$pdf->Cell(12,4,$move['move'],'LTB',0,'L');
 		
 		if(isset($move['variation']) || isset($move['result'])) {
 			$pdf->SetFont('Arial','B',7);
@@ -49,20 +104,20 @@ function addMove(&$pdf, $key, $move) {
 			$pdf->SetFont('Arial','',7);
 		}
 
-		if(isset($move['eval'])){
+		if (isset($move['result'])) {
+			$pdf->Cell(8,4,$move['result'],'TBR',1,'R');
+		} else if(isset($move['eval'])){
 			$tmp = sprintf('%+3.2f',$move['eval']/100);
 			if(strlen($tmp) == 7) {
 				$tmp = substr($tmp,0,4);
 			} else {
 				$tmp = substr($tmp,0,5);
 			}
-			$pdf->Cell(8,4,$tmp,'BR',1,'R',isset($move['variation'])? 1 : 0);
+			$pdf->Cell(8,4,$tmp,'TBR',1,'R',isset($move['variation'])? 1 : 0);
 		} else if (isset($move['mate'])) {
-			$pdf->Cell(8,4,'# '.$move['mate'],'BR',1,'R',isset($move['variation'])? 1 : 0);
-		} else if (isset($move['result'])) {
-			$pdf->Cell(8,4,$move['result'],'BR',1,'R');
+			$pdf->Cell(8,4,'# '.$move['mate'],'TBR',1,'R',isset($move['variation'])? 1 : 0);
 		} else {
-			$pdf->Cell(8,4,'','BR',1);
+			$pdf->Cell(8,4,'','TBR',1);
 		}
 	}
 }
@@ -227,9 +282,9 @@ function addHeader(&$pdf, $game){
 
 	// Ratings
 	$pdf->SetFont('Arial','',15);
-	$pdf->Cell(88,7,$game['players']['white']['rating'].(isset($game['players']['white']['ratingDiff'])? sprintf(' %+d'):''),0,0,'R');
+	$pdf->Cell(88,7,$game['players']['white']['rating'].(isset($game['players']['white']['ratingDiff'])? sprintf(' %+d', $game['players']['white']['ratingDiff']):''),0,0,'R');
 	$pdf->Cell(14);
-	$pdf->Cell(90,7,$game['players']['black']['rating'].(isset($game['players']['white']['ratingDiff'])? sprintf(' %+d'):''),0,1,'L');
+	$pdf->Cell(90,7,$game['players']['black']['rating'].(isset($game['players']['white']['ratingDiff'])? sprintf(' %+d', $game['players']['white']['ratingDiff']):''),0,1,'L');
 
 	// Result
 	$pdf->SetFont('Arial','',15);
@@ -251,20 +306,70 @@ function addFooter(&$pdf) {
 	$pdf->Cell(0,10,'Page '.$pdf->PageNo(),0,0,'C');
 }
 
-function addBoard(&$pdf, $key, $move, $position) {
+function addBoard(&$pdf, $location, $annotation, $position) {
 	$pid = getmypid();
-	if ( $key == 0 ) {
-		createBoard($position, 'resources/images/'.$pid.'.png');
-		$pdf->Image('resources/images/'.$pid.'.png',59, 49, 45);
-		unlink('resources/images/'.$pid.'.png');
-		$pdf->SetXY(59,94);
-		$pdf->SetFont('Arial','B',9);
-		$pdf->SetDrawColor(190);
-		$pdf->Cell(45,5,'Initial position',0,0,'C');
+	createBoard($position, 'resources/images/'.$pid.'.png');
+	switch($location) {
+		case 0:
+			$pdf->Image('resources/images/'.$pid.'.png',59, 49, 45);
+			$pdf->SetXY(59,94);
+			$pdf->SetFont('Arial','B',9);
+			$pdf->SetDrawColor(190);
+			$pdf->Cell(45,5,$annotation,0,0,'C');
+		break;
+		case 1:
+			$pdf->Image('resources/images/'.$pid.'.png',59, 99, 45);
+			$pdf->SetXY(59,144);
+			$pdf->SetFont('Arial','B',9);
+			$pdf->SetDrawColor(190);
+			$pdf->Cell(45,5,$annotation,0,0,'C');
+		break;
+		case 2:
+			$pdf->Image('resources/images/'.$pid.'.png',59, 149, 45);
+			$pdf->SetXY(59,194);
+			$pdf->SetFont('Arial','B',9);
+			$pdf->SetDrawColor(190);
+			$pdf->Cell(45,5,$annotation,0,0,'C');
+		break;
+		case 3:
+			$pdf->Image('resources/images/'.$pid.'.png',59, 199, 45);
+			$pdf->SetXY(59,244);
+			$pdf->SetFont('Arial','B',9);
+			$pdf->SetDrawColor(190);
+			$pdf->Cell(45,5,$annotation,0,0,'C');
+		break;
+		case 4:
+			$pdf->Image('resources/images/'.$pid.'.png',153, 49, 45);
+			$pdf->SetXY(153,94);
+			$pdf->SetFont('Arial','B',9);
+			$pdf->SetDrawColor(190);
+			$pdf->Cell(45,5,$annotation,0,0,'C');
+		break;
+		case 5:
+			$pdf->Image('resources/images/'.$pid.'.png',153, 99, 45);
+			$pdf->SetXY(153,144);
+			$pdf->SetFont('Arial','B',9);
+			$pdf->SetDrawColor(190);
+			$pdf->Cell(45,5,$annotation,0,0,'C');
+		break;
+		case 6:
+			$pdf->Image('resources/images/'.$pid.'.png',153, 149, 45);
+			$pdf->SetXY(153,194);
+			$pdf->SetFont('Arial','B',9);
+			$pdf->SetDrawColor(190);
+			$pdf->Cell(45,5,$annotation,0,0,'C');
+		break;
+		case 7:
+			$pdf->Image('resources/images/'.$pid.'.png',153, 199, 45);
+			$pdf->SetXY(153,244);
+			$pdf->SetFont('Arial','B',9);
+			$pdf->SetDrawColor(190);
+			$pdf->Cell(45,5,$annotation,0,0,'C');
 	}
+	unlink('resources/images/'.$pid.'.png');
 }
 
-function createPDF($game) {
+function createPDF(&$game) {
 	/*
 	Basic procedure:
 	1. Header:
@@ -289,9 +394,28 @@ function createPDF($game) {
 	$x = $pdf->GetX();
 	$y = $pdf->GetY();
 
-	addBoard($pdf, 0, '', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+	addBoard($pdf, 0, 'initial position', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+	addBoard($pdf, 1, 'position 1', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+	addBoard($pdf, 2, 'position 2', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+	addBoard($pdf, 3, 'position 3', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+	addBoard($pdf, 4, 'position 4', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+	addBoard($pdf, 5, 'position 5', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+	addBoard($pdf, 6, 'position 6', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+	addBoard($pdf, 7, 'position 7', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
 
 	// Moves list
+	$movesList = explode(' ', $game['moves']);
+
+	if (!isset($game['analysis'])) {
+		$game['analysis'] = array();
+	}
+
+	foreach ($movesList as $key => $move) {
+		if (!isset($game['analysis'][$key])) {
+			array_push($game['analysis'], array('move' => $move, 'result' => null));
+		}
+	}
+
 	$pdf->SetXY($x, $y);
 	$pdf->Cell(0,1,'',0,1);
 	$pdf->SetFillColor(190);
@@ -303,7 +427,6 @@ function createPDF($game) {
 	} else {
 		$pdf->Cell(95,6,'',0,1,'L',1);
 	}
-	
 
 	$pdf->SetFillColor(255);
 	$pdf->SetTextColor(0);
@@ -311,15 +434,16 @@ function createPDF($game) {
 	if(isset($game['analysis'])) {
 		foreach($game['analysis'] as $key => $move){
 			if ($key == count($game['analysis'])-1) {
-				addMove($pdf, $key, array('move' => $move['move'], 'result' => formatWinShort($game)));
+				addMove($pdf, $key, array('move' => $move['move'], 'eval' => $move['eval'], 'mate' => $move['mate'],'result' => formatWinShort($game)), null);
 			} else {
-				addMove($pdf, $key, $move);
+				addMove($pdf, $key, $move, ((isset($game['analysis'][$key+1]))? $game['analysis'][$key+1] : null));
 			}
 			
-			if($key == 111) {
+			if($key%111 == 0 && $key%222 != 0 && $key != 0) {
 				$pdf->SetXY(104,49);
 				$pdf->SetLeftMargin(104);
-			} else if ($pdf->GetY > 260 && $pdf->GetX() >= 104) {
+			} else if ($key%223 == 0 && $key != 0) {
+				addFooter($pdf);
 				$pdf->SetLeftMargin(10);
 				$pdf->SetRightMargin(105);
 				$pdf->AddPage();
@@ -347,9 +471,20 @@ function createPDF($game) {
 				$pdf->SetLeftMargin(104);
 				$pdf->SetRightMargin(10);
 			}
+		} else if ($pdf->GetX() < 104) {
+			$pdf->SetLeftMargin(10);
+			$pdf->SetRightMargin(110);
+		} else {
+			$pdf->SetLeftMargin(104);
+			$pdf->SetRightMargin(10);
 		}
 
 		// Comments & Variations
+		if($pdf->GetY() > 240 && $pdf->GetX <104) {
+			$pdf->SetXY(104,49);
+			$pdf->SetLeftMargin(104);
+			$pdf->SetRightMargin(10);
+		}
 		$pdf->SetFont('Arial','B',13);
 		$pdf->SetTextColor(0);
 		$pdf->Cell(30,8,'Comments & Variations',0,1,'L');
