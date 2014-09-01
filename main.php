@@ -483,6 +483,10 @@ function createPDF(&$game) {
 		$pdf->Ln(5);
 
 		// Determine where the cursor should be placed
+		if($pdf->GetY() < $addBoardsPos['y']) {
+			$pdf->SetY($addBoardsPos['y']+5);
+		}
+		
 		if($pdf->GetY() > 255) {
 			if($pdf->GetX() >= 104) {
 				addFooter($pdf);
@@ -508,10 +512,6 @@ function createPDF(&$game) {
 			$pdf->SetXY(104,49);
 			$pdf->SetLeftMargin(104);
 			$pdf->SetRightMargin(10);
-		}
-
-		if($pdf->GetY() < $addBoardsPos['y']) {
-			$pdf->SetY($addBoardsPos['y']+5);
 		}
 		
 		$printedCom = false;
