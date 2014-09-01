@@ -1,4 +1,4 @@
-PNGtoPDF
+lichess PDF Exporter
 ========
 
 Create print-friendly PDF copy of a game played on lichess
