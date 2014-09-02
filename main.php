@@ -527,7 +527,7 @@ function createPDF(&$game) {
 			$pdf->SetFont('Arial','B',9.5);
 			$pdf->Write(3.5,'Opening ');
 			$pdf->SetFont('Arial','',9.5);
-			$pdf->Write(3.5,$game['opening']['name']);
+			$pdf->Write(3.5,$game['opening']['code'].' - '.$game['opening']['name']);
 			$pdf->Ln(5);
 
 			$printedCom = true;
