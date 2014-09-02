@@ -373,31 +373,33 @@ function addBoards(&$pdf, $game) {
 	$pageX = $pdf->GetX();
 	$pageY = $pdf->GetY();
 
-	$pageNo = $pdf->PageNo();
+	if (isset($game['fens'])) {
+		$pageNo = $pdf->PageNo();
 
-	$remain = count($game['analysis']) - 224*($pageNo-1);
-	$remain = ($remain > 224)? 224 : $remain;
+		$remain = count($game['analysis']) - 224*($pageNo-1);
+		$remain = ($remain > 224)? 224 : $remain;
 
-	if ($pageNo == 1 && isset($game['initialFen'])) {
-		addBoard($pdf, 0, 'Initial position', $game['initialFen'], 0);
-		$adder = 28;
-		$y = 1;
-	} else {
-		$adder = 0;
-		$y = 0;
+		if ($pageNo == 1 && isset($game['initialFen'])) {
+			addBoard($pdf, 0, 'Initial position', $game['initialFen'], 0);
+			$adder = 28;
+			$y = 1;
+		} else {
+			$adder = 0;
+			$y = 0;
+		}
+		
+		for ($x = $adder; $x < $remain; $x+=28) {
+			$moveNo = 224*($pageNo-1)+$x+24;
+			if (!isset($game['analysis'][$moveNo])) {
+				$moveNo = count($game['analysis'])-1;
+			}
+			$annotation = (floor($moveNo/2 + 1) ) . (($moveNo%2 == 0)? '. ' : '... ') . $game['analysis'][$moveNo]['move'];
+			addBoard($pdf, $y, $annotation, $game['fens'][$moveNo], $moveNo);
+			$y++;
+		}
+		$final = array('x' => $pdf->getX(), 'y' => $pdf->GetY());
 	}
 	
-	for ($x = $adder; $x < $remain; $x+=28) {
-		$moveNo = 224*($pageNo-1)+$x+24;
-		if (!isset($game['analysis'][$moveNo])) {
-			$moveNo = count($game['analysis'])-1;
-		}
-		$annotation = (floor($moveNo/2 + 1) ) . (($moveNo%2 == 0)? '. ' : '... ') . $game['analysis'][$moveNo]['move'];
-		//$annotation = $game['fens'][$moveNo];
-		addBoard($pdf, $y, $annotation, $game['fens'][$moveNo], $moveNo);
-		$y++;
-	}
-	$final = array('x' => $pdf->getX(), 'y' => $pdf->GetY());
 	$pdf->SetXY($pageX, $pageY);
 
 	return $final;
@@ -486,7 +488,7 @@ function createPDF(&$game) {
 		if($pdf->GetY() < $addBoardsPos['y']) {
 			$pdf->SetY($addBoardsPos['y']+5);
 		}
-		
+
 		if($pdf->GetY() > 255) {
 			if($pdf->GetX() >= 104) {
 				addFooter($pdf);
@@ -515,13 +517,29 @@ function createPDF(&$game) {
 		}
 		
 		$printedCom = false;
+		
+
+		if (isset($game['opening']['name'])) {
+			$pdf->SetFont('Arial','B',13);
+			$pdf->SetTextColor(0);
+			$pdf->Cell(30,8,'Comments & Variations',0,1,'L');
+
+			$pdf->SetFont('Arial','B',9.5);
+			$pdf->Write(3.5,'Opening ');
+			$pdf->SetFont('Arial','',9.5);
+			$pdf->Write(3.5,$game['opening']['name']);
+			$pdf->Ln(5);
+
+			$printedCom = true;
+		}
 
 		foreach($game['analysis'] as $key => $move){
 			if(isset($move['variation'])) {
-				if($printedCom == false) {
+				if ($printedCom == false) {
 					$pdf->SetFont('Arial','B',13);
 					$pdf->SetTextColor(0);
 					$pdf->Cell(30,8,'Comments & Variations',0,1,'L');
+
 					$printedCom = true;
 				}
 				if($pdf->GetY() > 255) {
@@ -549,6 +567,6 @@ function createPDF(&$game) {
 	$pdf->Output();
 }
 
-$game = json_decode(file_get_contents('http://en.lichess.org/api/game/'.$_GET['id'].'?with_analysis=1&with_moves=1&with_fens=1'), TRUE);
+$game = json_decode(file_get_contents('http://en.lichess.org/api/game/'.$_GET['id'].'?with_analysis=1&with_moves=1&with_fens=1&with_opening=1'), TRUE);
 
 createPDF($game);
