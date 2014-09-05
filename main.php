@@ -25,35 +25,65 @@ function addMove(&$pdf, $key, $move, $next) {
 			$curEval = ($move['mate'] > 0)? 19 : -19;
 		}
 
-		$pdf->SetLineWidth(0.5);
-		$pdf->SetDrawColor(230);
 		$x = $pdf->GetX();
 		$y = $pdf->GetY();
 
 		if (isset($curEval)) {
 			if ($curEval >= 0) {
+				$pdf->SetLineWidth(0.5);
+				$pdf->SetDrawColor(230);
+
 				$pdf->Line($x+28.75, $y+0.25, $x+28.75-$curEval, $y+0.25);
 				$pdf->Line($x+28.75, $y+0.75, $x+28.75-$curEval, $y+0.75);
 				$pdf->Line($x+28.75, $y+1.25, $x+28.75-$curEval, $y+1.25);
 				$pdf->Line($x+28.75, $y+1.75, $x+28.75-$curEval, $y+1.75);
+				
+				//$pdf->SetLineWidth(0.2);
+				$pdf->SetDrawColor(170);
+
+				$pdf->Line($x+28.75-$curEval, $y+0.25, $x+28.75-$curEval, $y+2-0.25);
 			} else {
+				$pdf->SetLineWidth(0.5);
+				$pdf->SetDrawColor(230);
+				
 				$pdf->Line($x+29.25, $y+0.25, $x+29.25-$curEval, $y+0.25);
 				$pdf->Line($x+29.25, $y+0.75, $x+29.25-$curEval, $y+0.75);
 				$pdf->Line($x+29.25, $y+1.25, $x+29.25-$curEval, $y+1.25);
 				$pdf->Line($x+29.25, $y+1.75, $x+29.25-$curEval, $y+1.75);
+
+				//$pdf->SetLineWidth(0.2);
+				$pdf->SetDrawColor(170);
+
+				$pdf->Line($x+29.75-$curEval, $y+0.25, $x+29.75-$curEval, $y+2-0.25);
 			}
 		}
 		if (isset($nextEval)) {
 			if ($nextEval >= 0) {
+				$pdf->SetLineWidth(0.5);
+				$pdf->SetDrawColor(230);
+				
 				$pdf->Line($x+28.75, $y+2.25, $x+28.75-$nextEval, $y+2.25);
 				$pdf->Line($x+28.75, $y+2.75, $x+28.75-$nextEval, $y+2.75);
 				$pdf->Line($x+28.75, $y+3.25, $x+28.75-$nextEval, $y+3.25);
 				$pdf->Line($x+28.75, $y+3.75, $x+28.75-$nextEval, $y+3.75);
+
+				//$pdf->SetLineWidth(0.2);
+				$pdf->SetDrawColor(170);
+
+				$pdf->Line($x+28.75-$nextEval, $y+2+0.25, $x+28.75-$nextEval, $y+4-0.25);
 			} else {
+				$pdf->SetLineWidth(0.5);
+				$pdf->SetDrawColor(230);
+				
 				$pdf->Line($x+29.25, $y+2.25, $x+29.25-$nextEval, $y+2.25);
 				$pdf->Line($x+29.25, $y+2.75, $x+29.25-$nextEval, $y+2.75);
 				$pdf->Line($x+29.25, $y+3.25, $x+29.25-$nextEval, $y+3.25);
 				$pdf->Line($x+29.25, $y+3.75, $x+29.25-$nextEval, $y+3.75);
+
+				//$pdf->SetLineWidth(0.2);
+				$pdf->SetDrawColor(170);
+
+				$pdf->Line($x+29.75-$nextEval, $y+2+0.25, $x+29.75-$nextEval, $y+4-0.25);
 			}
 		}
 
@@ -296,14 +326,14 @@ function addHeader(&$pdf, $game){
 function addFooter(&$pdf) {
 	$pdf->SetLeftMargin(10);
 	$pdf->SetRightMargin(10);
-	$pdf->SetXY(10,-20);
+	$pdf->SetXY(10,-15);
 	$pdf->SetFont('Arial','IB',8);
 	$pdf->Write(3,'Legend');
 	$pdf->SetFont('Arial','I',8);
 	$pdf->Write(3," +1.00 = 1 pawn advantage to white.  -1.00 = 1 pawn advantage to black. # 2 = White has mate in 2. # -2 = Black has mate in 2.\n");
 	$pdf->Write(3,"                Highlighted evaluations are errors in play and have notes in the Comments & Variations section.");
-	$pdf->SetXY(0,-15);
-	$pdf->Cell(0,10,'Page '.$pdf->PageNo(),0,0,'C');
+	//$pdf->SetXY(0,-15);
+	//$pdf->Cell(0,10,'Page '.$pdf->PageNo(),0,0,'C');
 }
 
 function addBoard(&$pdf, $location, $annotation, $position, $id) {
@@ -539,7 +569,6 @@ function createPDF(&$game) {
 					$pdf->SetFont('Arial','B',13);
 					$pdf->SetTextColor(0);
 					$pdf->Cell(30,8,'Comments & Variations',0,1,'L');
-
 					$printedCom = true;
 				}
 				if($pdf->GetY() > 255) {
