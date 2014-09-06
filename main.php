@@ -4,7 +4,7 @@ include('resources/board-creator/board-creator.php');
 
 date_default_timezone_set('UTC');
 
-function addMove(&$pdf, $key, $move, $next) {
+function addMove($pdf, $key, $move, $next) {
 	// round evals and convert to millimeters, scaling to a max val of 19mm
 	if($key%2==0) {
 		// White's move
@@ -171,7 +171,7 @@ function formatComment($key, $move, $game) {
 	return $output;
 }
 
-function addMoveString(&$pdf, $ply, $moves) {
+function addMoveString($pdf, $ply, $moves) {
 	$moves = explode(' ', $moves);
 	$output = '';
 	foreach($moves as $key => $move) {
@@ -188,7 +188,7 @@ function addMoveString(&$pdf, $ply, $moves) {
 	return $output;
 }
 
-function addVariation(&$pdf, $key, $move, $game) {
+function addVariation($pdf, $key, $move, $game) {
 	$pdf->SetFont('Arial','B',9.5);
 	$pdf->Write(3.5,(floor($key/2)+1).(($key%2==0)? '. ' : '... ').$move['move'].' ');
 	$pdf->SetFont('Arial','',9.5);
@@ -214,7 +214,7 @@ function getUsername($id) {
 	return 'Unknown';
 }
 
-function formatWin(&$game) {
+function formatWin($game) {
 	if(isset($game['winner'])){
 		if($game['winner'] == 'white') {
 			switch($game['status']) {
@@ -260,7 +260,7 @@ function formatWin(&$game) {
 	return $output;
 }
 
-function formatWinShort(&$game) {
+function formatWinShort($game) {
 	if(isset($game['winner'])){
 		if($game['winner'] == 'white') {
 			$output = '1-0';
@@ -276,7 +276,7 @@ function formatWinShort(&$game) {
 	return $output;
 }
 
-function addHeader(&$pdf, $game){
+function addHeader($pdf, $game){
 	// ----/// Header ///----
 	// Logo
 	$pdf->Image('resources/images/logo.png',160,9.5,37);
@@ -323,7 +323,7 @@ function addHeader(&$pdf, $game){
 	$pdf->SetTextColor(0);
 }
 
-function addFooter(&$pdf) {
+function addFooter($pdf) {
 	$pdf->SetLeftMargin(10);
 	$pdf->SetRightMargin(10);
 	$pdf->SetXY(10,-15);
@@ -336,7 +336,7 @@ function addFooter(&$pdf) {
 	//$pdf->Cell(0,10,'Page '.$pdf->PageNo(),0,0,'C');
 }
 
-function addBoard(&$pdf, $location, $annotation, $position, $id) {
+function addBoard($pdf, $location, $annotation, $position, $id) {
 	$pid = getmypid();
 	createBoard($position, 'resources/images/'.$pid.$id.'.png');
 	switch($location) {
@@ -399,7 +399,7 @@ function addBoard(&$pdf, $location, $annotation, $position, $id) {
 	unlink('resources/images/'.$pid.$id.'.png');
 }
 
-function addBoards(&$pdf, $game) {
+function addBoards($pdf, $game) {
 	$pageX = $pdf->GetX();
 	$pageY = $pdf->GetY();
 
@@ -435,7 +435,7 @@ function addBoards(&$pdf, $game) {
 	return $final;
 }
 
-function createPDF(&$game) {
+function createPDF($game) {
 	/*
 	Basic procedure:
 	1. Header:
@@ -596,6 +596,10 @@ function createPDF(&$game) {
 	$pdf->Output();
 }
 
-$game = json_decode(file_get_contents('http://en.lichess.org/api/game/'.$_GET['id'].'?with_analysis=1&with_moves=1&with_fens=1&with_opening=1'), TRUE);
+if (isset($argv[1])) {
+	$game = json_decode(file_get_contents('http://en.lichess.org/api/game/'.$argv[1].'?with_analysis=1&with_moves=1&with_fens=1&with_opening=1'), TRUE);
+} else {
+	$game = json_decode(file_get_contents('http://en.lichess.org/api/game/'.$_GET['id'].'?with_analysis=1&with_moves=1&with_fens=1&with_opening=1'), TRUE);	
+}
 
 createPDF($game);
