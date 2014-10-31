@@ -10,6 +10,8 @@ function addMove($pdf, $key, $move, $next) {
 		// White's move
 
 		// Advantage line
+
+		/*
 		if (isset($next['eval'])) {
 			$nextEval = ($next['eval'] > 1000)? 1000 : (($next['eval'] < -1000)? -1000 : $next['eval']);
 			$nextEval = 19*($nextEval / 1000);
@@ -86,6 +88,7 @@ function addMove($pdf, $key, $move, $next) {
 				$pdf->Line($x+29.75-$nextEval, $y+2+0.25, $x+29.75-$nextEval, $y+4-0.25);
 			}
 		}
+		*/
 
 		$pdf->SetLineWidth(0.2);
 		
@@ -205,7 +208,7 @@ function getUsername($id) {
 	if (isset($id)) {
 		$info = json_decode(file_get_contents('http://lichess.org/api/user/'.$id),true);
 		if (isset($info['username'])){
-			return (($info['title'] != null)? strtoupper($info['title']).' ' : '' ).$info['username'];
+			return (isset($info['title']) ? strtoupper($info['title']).' ' : '' ).$info['username'];
 		} else {
 			return $id;
 		}
@@ -492,7 +495,14 @@ function createPDF($game) {
 	if(isset($game['analysis'])) {
 		foreach($game['analysis'] as $key => $move){
 			if ($key == count($game['analysis'])-1) {
-				addMove($pdf, $key, array('move' => $move['move'], 'eval' => $move['eval'], 'mate' => $move['mate'],'result' => formatWinShort($game)), null);
+				addMove($pdf, $key, 
+					array('move' => isset($move['move'])? $move['move'] : NULL, 
+						'eval' => isset($move['eval'])? $move['eval'] : NULL, 
+						'mate' => isset($move['mate'])? $move['mate'] : NULL, 
+						'result' => formatWinShort($game)
+						),
+					null
+				);
 			} else {
 				addMove($pdf, $key, $move, ((isset($game['analysis'][$key+1]))? $game['analysis'][$key+1] : null));
 			}
