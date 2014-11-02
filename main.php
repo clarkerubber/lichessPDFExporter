@@ -4,6 +4,10 @@ include('resources/board-creator/board-creator.php');
 
 date_default_timezone_set('UTC');
 
+function getOr($arr, $key, $def=null) {
+	return isset($arr['key'])? $arr['key'] : $def;
+}
+
 function addMove($pdf, $key, $move, $next) {
 	// round evals and convert to millimeters, scaling to a max val of 19mm
 	if($key%2==0) {
@@ -208,7 +212,7 @@ function getUsername($id) {
 	if (isset($id)) {
 		$info = json_decode(file_get_contents('http://lichess.org/api/user/'.$id),true);
 		if (isset($info['username'])){
-			return (isset($info['title']) ? strtoupper($info['title']).' ' : '' ).$info['username'];
+			return ( isset($info['title']) ? strtoupper($info['title']).' ' : '' ).$info['username'];
 		} else {
 			return $id;
 		}
@@ -308,16 +312,16 @@ function addHeader($pdf, $game){
 
 	// Names
 	$pdf->SetFont('Arial','B',15);
-	$pdf->Cell(88,7,getUsername($game['players']['white']['userId']),0,0,'R');
+	$pdf->Cell(88,7,getUsername(getOr($game['players']['white'], 'userId')),0,0,'R');
 	$pdf->Cell(14);
-	$pdf->Cell(90,7,getUsername($game['players']['black']['userId']),0,1,'L');
+	$pdf->Cell(90,7,getUsername(getOr($game['players']['black'], 'userId')),0,1,'L');
 	$pdf->Image('resources/images/swords.png', 100, 22, 10);
 
 	// Ratings
 	$pdf->SetFont('Arial','',15);
-	$pdf->Cell(88,7,$game['players']['white']['rating'].(isset($game['players']['white']['ratingDiff'])? sprintf(' %+d', $game['players']['white']['ratingDiff']):''),0,0,'R');
+	$pdf->Cell(88,7,getOr($game['players']['white'], 'rating', '').sprintf(' %+d', getOr($game['players']['white'], 'ratingDiff', '')),0,0,'R');
 	$pdf->Cell(14);
-	$pdf->Cell(90,7,$game['players']['black']['rating'].(isset($game['players']['black']['ratingDiff'])? sprintf(' %+d', $game['players']['black']['ratingDiff']):''),0,1,'L');
+	$pdf->Cell(90,7,getOr($game['players']['black'], 'rating', '').sprintf(' %+d', getOr($game['players']['black'], 'ratingDiff', '')),0,1,'L');
 
 	// Result
 	$pdf->SetFont('Arial','',15);
@@ -496,15 +500,15 @@ function createPDF($game) {
 		foreach($game['analysis'] as $key => $move){
 			if ($key == count($game['analysis'])-1) {
 				addMove($pdf, $key, 
-					array('move' => isset($move['move'])? $move['move'] : NULL, 
-						'eval' => isset($move['eval'])? $move['eval'] : NULL, 
-						'mate' => isset($move['mate'])? $move['mate'] : NULL, 
+					array('move' => getOr($move['move']), 
+						'eval' => getOr($move['eval']), 
+						'mate' => getOr($move['mate']), 
 						'result' => formatWinShort($game)
 						),
 					null
 				);
 			} else {
-				addMove($pdf, $key, $move, ((isset($game['analysis'][$key+1]))? $game['analysis'][$key+1] : null));
+				addMove($pdf, $key, $move, getOr($game['analysis'], $key+1));
 			}
 			
 			if($key%111 == 0 && $key%222 != 0 && $key != 0) {
