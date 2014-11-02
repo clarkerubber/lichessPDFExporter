@@ -500,9 +500,9 @@ function createPDF($game) {
 		foreach($game['analysis'] as $key => $move){
 			if ($key == count($game['analysis'])-1) {
 				addMove($pdf, $key, 
-					array('move' => getOr($move['move']), 
-						'eval' => getOr($move['eval']), 
-						'mate' => getOr($move['mate']), 
+					array('move' => getOr($move, 'move'), 
+						'eval' => getOr($move, 'eval'), 
+						'mate' => getOr($move, 'mate'), 
 						'result' => formatWinShort($game)
 						),
 					null
