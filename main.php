@@ -230,10 +230,35 @@ function addHeader($pdf, $game){
 	$pdf->SetTextColor(0);
 
 	// Names
+	// -- If imported
+	$pattern = "/^([^\(]+)\((\d+)\)$/";
+
+	if(isset($game['players']['white']['name'])) {
+		if(preg_match_all($pattern, $game['players']['white']['name'], $matches)) {
+			$game['players']['white']['username'] = trim(getOr($matches[1], 0, ''));
+			$game['players']['white']['rating'] = getOr($matches[2], 0);
+		} else {
+			$game['players']['white']['username'] = trim($game['players']['white']['name']);
+		}
+	} else {
+		$game['players']['white']['username'] = getUsername(getOr($game['players']['white'], 'userId'));
+	}
+
+	if(isset($game['players']['black']['name'])) {
+		if(preg_match_all($pattern, $game['players']['black']['name'], $matches)) {
+			$game['players']['black']['username'] = trim(getOr($matches[1], 0, ''));
+			$game['players']['black']['rating'] = getOr($matches[2], 0);
+		} else {
+			$game['players']['black']['username'] = trim($game['players']['black']['name']);
+		}
+	} else {
+		$game['players']['black']['username'] = getUsername(getOr($game['players']['black'], 'userId'));
+	}
+
 	$pdf->SetFont('Arial','B',15);
-	$pdf->Cell(88,7,getUsername(getOr($game['players']['white'], 'userId')),0,0,'R');
+	$pdf->Cell(88,7,$game['players']['white']['username'],0,0,'R');
 	$pdf->Cell(14);
-	$pdf->Cell(90,7,getUsername(getOr($game['players']['black'], 'userId')),0,1,'L');
+	$pdf->Cell(90,7,$game['players']['black']['username'],0,1,'L');
 	$pdf->Image('resources/images/swords.png', 100, 22, 10);
 
 	// Ratings
