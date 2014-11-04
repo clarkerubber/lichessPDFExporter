@@ -344,63 +344,63 @@ function addFooter($pdf) {
 }
 
 function addBoard($pdf, $location, $annotation, $position, $id) {
-	$tmp = tempnam('/tmp', 'brd').'.png';
+	$tmp = tempnam('/tmp', 'brd');
 	if($tmp == false) {
 		return;
 	}
 	createBoard($position, $tmp);
 	switch($location) {
 		case 0:
-			$pdf->Image($tmp,59, 49, 45);
+			$pdf->Image($tmp,59, 49, 45, null, 'PNG');
 			$pdf->SetXY(59,94);
 			$pdf->SetFont('Arial','BI',9);
 			$pdf->SetDrawColor(190);
 			$pdf->Cell(45,5,$annotation,0,0,'C');
 		break;
 		case 1:
-			$pdf->Image($tmp,59, 99+5, 45);
+			$pdf->Image($tmp,59, 99+5, 45, null, 'PNG');
 			$pdf->SetXY(59,144+5);
 			$pdf->SetFont('Arial','BI',9);
 			$pdf->SetDrawColor(190);
 			$pdf->Cell(45,5,$annotation,0,0,'C');
 		break;
 		case 2:
-			$pdf->Image($tmp,59, 149+10, 45);
+			$pdf->Image($tmp,59, 149+10, 45, null, 'PNG');
 			$pdf->SetXY(59,194+10);
 			$pdf->SetFont('Arial','BI',9);
 			$pdf->SetDrawColor(190);
 			$pdf->Cell(45,5,$annotation,0,0,'C');
 		break;
 		case 3:
-			$pdf->Image($tmp,59, 199+15, 45);
+			$pdf->Image($tmp,59, 199+15, 45, null, 'PNG');
 			$pdf->SetXY(59,244+15);
 			$pdf->SetFont('Arial','BI',9);
 			$pdf->SetDrawColor(190);
 			$pdf->Cell(45,5,$annotation,0,0,'C');
 		break;
 		case 4:
-			$pdf->Image($tmp,153, 49, 45);
+			$pdf->Image($tmp,153, 49, 45, null, 'PNG');
 			$pdf->SetXY(153,94);
 			$pdf->SetFont('Arial','BI',9);
 			$pdf->SetDrawColor(190);
 			$pdf->Cell(45,5,$annotation,0,0,'C');
 		break;
 		case 5:
-			$pdf->Image($tmp,153, 99+5, 45);
+			$pdf->Image($tmp,153, 99+5, 45, null, 'PNG');
 			$pdf->SetXY(153,144+5);
 			$pdf->SetFont('Arial','BI',9);
 			$pdf->SetDrawColor(190);
 			$pdf->Cell(45,5,$annotation,0,0,'C');
 		break;
 		case 6:
-			$pdf->Image($tmp,153, 149+10, 45);
+			$pdf->Image($tmp,153, 149+10, 45, null, 'PNG');
 			$pdf->SetXY(153,194+10);
 			$pdf->SetFont('Arial','BI',9);
 			$pdf->SetDrawColor(190);
 			$pdf->Cell(45,5,$annotation,0,0,'C');
 		break;
 		case 7:
-			$pdf->Image($tmp,153, 199+15, 45);
+			$pdf->Image($tmp,153, 199+15, 45, null, 'PNG');
 			$pdf->SetXY(153,244+15);
 			$pdf->SetFont('Arial','BI',9);
 			$pdf->SetDrawColor(190);
