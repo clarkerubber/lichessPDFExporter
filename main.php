@@ -5,94 +5,13 @@ include('resources/board-creator/board-creator.php');
 date_default_timezone_set('UTC');
 
 function getOr($arr, $key, $def=null) {
-	return isset($arr['key'])? $arr['key'] : $def;
+	return isset($arr["$key"])? $arr["$key"] : $def;
 }
 
 function addMove($pdf, $key, $move, $next) {
 	// round evals and convert to millimeters, scaling to a max val of 19mm
 	if($key%2==0) {
 		// White's move
-
-		// Advantage line
-
-		/*
-		if (isset($next['eval'])) {
-			$nextEval = ($next['eval'] > 1000)? 1000 : (($next['eval'] < -1000)? -1000 : $next['eval']);
-			$nextEval = 19*($nextEval / 1000);
-		}
-		if (isset($move['eval'])) {
-			$curEval = ($move['eval'] > 1000)? 1000 : (($move['eval'] < -1000)? -1000 : $move['eval']);
-			$curEval = 19*($curEval / 1000);
-		}
-		if (isset($next['mate'])) {
-			$nextEval = ($next['mate'] > 0)? 19 : -19;
-		}
-		if (isset($move['mate'])) {
-			$curEval = ($move['mate'] > 0)? 19 : -19;
-		}
-
-		$x = $pdf->GetX();
-		$y = $pdf->GetY();
-
-		if (isset($curEval)) {
-			if ($curEval >= 0) {
-				$pdf->SetLineWidth(0.5);
-				$pdf->SetDrawColor(230);
-
-				$pdf->Line($x+28.75, $y+0.25, $x+28.75-$curEval, $y+0.25);
-				$pdf->Line($x+28.75, $y+0.75, $x+28.75-$curEval, $y+0.75);
-				$pdf->Line($x+28.75, $y+1.25, $x+28.75-$curEval, $y+1.25);
-				$pdf->Line($x+28.75, $y+1.75, $x+28.75-$curEval, $y+1.75);
-				
-				//$pdf->SetLineWidth(0.2);
-				$pdf->SetDrawColor(170);
-
-				$pdf->Line($x+28.75-$curEval, $y+0.25, $x+28.75-$curEval, $y+2-0.25);
-			} else {
-				$pdf->SetLineWidth(0.5);
-				$pdf->SetDrawColor(230);
-				
-				$pdf->Line($x+29.25, $y+0.25, $x+29.25-$curEval, $y+0.25);
-				$pdf->Line($x+29.25, $y+0.75, $x+29.25-$curEval, $y+0.75);
-				$pdf->Line($x+29.25, $y+1.25, $x+29.25-$curEval, $y+1.25);
-				$pdf->Line($x+29.25, $y+1.75, $x+29.25-$curEval, $y+1.75);
-
-				//$pdf->SetLineWidth(0.2);
-				$pdf->SetDrawColor(170);
-
-				$pdf->Line($x+29.75-$curEval, $y+0.25, $x+29.75-$curEval, $y+2-0.25);
-			}
-		}
-		if (isset($nextEval)) {
-			if ($nextEval >= 0) {
-				$pdf->SetLineWidth(0.5);
-				$pdf->SetDrawColor(230);
-				
-				$pdf->Line($x+28.75, $y+2.25, $x+28.75-$nextEval, $y+2.25);
-				$pdf->Line($x+28.75, $y+2.75, $x+28.75-$nextEval, $y+2.75);
-				$pdf->Line($x+28.75, $y+3.25, $x+28.75-$nextEval, $y+3.25);
-				$pdf->Line($x+28.75, $y+3.75, $x+28.75-$nextEval, $y+3.75);
-
-				//$pdf->SetLineWidth(0.2);
-				$pdf->SetDrawColor(170);
-
-				$pdf->Line($x+28.75-$nextEval, $y+2+0.25, $x+28.75-$nextEval, $y+4-0.25);
-			} else {
-				$pdf->SetLineWidth(0.5);
-				$pdf->SetDrawColor(230);
-				
-				$pdf->Line($x+29.25, $y+2.25, $x+29.25-$nextEval, $y+2.25);
-				$pdf->Line($x+29.25, $y+2.75, $x+29.25-$nextEval, $y+2.75);
-				$pdf->Line($x+29.25, $y+3.25, $x+29.25-$nextEval, $y+3.25);
-				$pdf->Line($x+29.25, $y+3.75, $x+29.25-$nextEval, $y+3.75);
-
-				//$pdf->SetLineWidth(0.2);
-				$pdf->SetDrawColor(170);
-
-				$pdf->Line($x+29.75-$nextEval, $y+2+0.25, $x+29.75-$nextEval, $y+4-0.25);
-			}
-		}
-		*/
 
 		$pdf->SetLineWidth(0.2);
 		
@@ -319,9 +238,9 @@ function addHeader($pdf, $game){
 
 	// Ratings
 	$pdf->SetFont('Arial','',15);
-	$pdf->Cell(88,7,getOr($game['players']['white'], 'rating', '').sprintf(' %+d', getOr($game['players']['white'], 'ratingDiff', '')),0,0,'R');
+	$pdf->Cell(88,7,getOr($game['players']['white'], 'rating', '').($game['rated']?sprintf(' %+d', getOr($game['players']['white'], 'ratingDiff', '')):''),0,0,'R');
 	$pdf->Cell(14);
-	$pdf->Cell(90,7,getOr($game['players']['black'], 'rating', '').sprintf(' %+d', getOr($game['players']['black'], 'ratingDiff', '')),0,1,'L');
+	$pdf->Cell(90,7,getOr($game['players']['black'], 'rating', '').($game['rated']?sprintf(' %+d', getOr($game['players']['black'], 'ratingDiff', '')):''),0,1,'L');
 
 	// Result
 	$pdf->SetFont('Arial','',15);
