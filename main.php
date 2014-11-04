@@ -5,7 +5,7 @@ include('resources/board-creator/board-creator.php');
 date_default_timezone_set('UTC');
 
 function getOr($arr, $key, $def=null) {
-	return isset($arr["$key"])? $arr["$key"] : $def;
+	return isset($arr[$key])? $arr[$key] : $def;
 }
 
 function addMove($pdf, $key, $move, $next) {
