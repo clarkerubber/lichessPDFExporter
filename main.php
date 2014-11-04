@@ -202,6 +202,25 @@ function formatWinShort($game) {
 	return $output;
 }
 
+function usernames($game) {
+	$pattern = "/^([^\(]+)\((\d+)\)$/";
+
+	foreach(array('white', 'black') as $side) {
+		if(isset($game['players'][$side]['name'])) {
+			if(preg_match_all($pattern, $game['players'][$side]['name'], $matches)) {
+				$game['players'][$side]['username'] = trim(getOr($matches[1], 0, ''));
+				$game['players'][$side]['rating'] = getOr($matches[2], 0);
+			} else {
+				$game['players'][$side]['username'] = trim($game['players'][$side]['name']);
+			}
+		} else {
+			$game['players'][$side]['username'] = getUsername(getOr($game['players'][$side], 'userId'));
+		}
+	}
+
+	return $game;
+}
+
 function addHeader($pdf, $game){
 	// ----/// Header ///----
 	// Logo
@@ -230,30 +249,7 @@ function addHeader($pdf, $game){
 	$pdf->SetTextColor(0);
 
 	// Names
-	// -- If imported
-	$pattern = "/^([^\(]+)\((\d+)\)$/";
-
-	if(isset($game['players']['white']['name'])) {
-		if(preg_match_all($pattern, $game['players']['white']['name'], $matches)) {
-			$game['players']['white']['username'] = trim(getOr($matches[1], 0, ''));
-			$game['players']['white']['rating'] = getOr($matches[2], 0);
-		} else {
-			$game['players']['white']['username'] = trim($game['players']['white']['name']);
-		}
-	} else {
-		$game['players']['white']['username'] = getUsername(getOr($game['players']['white'], 'userId'));
-	}
-
-	if(isset($game['players']['black']['name'])) {
-		if(preg_match_all($pattern, $game['players']['black']['name'], $matches)) {
-			$game['players']['black']['username'] = trim(getOr($matches[1], 0, ''));
-			$game['players']['black']['rating'] = getOr($matches[2], 0);
-		} else {
-			$game['players']['black']['username'] = trim($game['players']['black']['name']);
-		}
-	} else {
-		$game['players']['black']['username'] = getUsername(getOr($game['players']['black'], 'userId'));
-	}
+	$game = usernames($game);
 
 	$pdf->SetFont('Arial','B',15);
 	$pdf->Cell(88,7,$game['players']['white']['username'],0,0,'R');
