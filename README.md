@@ -7,7 +7,7 @@ PDFs are exported in A4 Portrait.
 
 ## Using the code
 
-Latest version of PHP is recommended.
+Latest version of PHP is recommended. PHP-GD necessary.
 
 Run a PHP server from the main directory, request a PDF from the browser by going to:
 
