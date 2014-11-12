@@ -23,7 +23,7 @@ function addMove($pdf, $key, $move, $next) {
 
 		$pdf->SetTextColor(0);
 		$pdf->SetFont('Arial','',10);
-		$pdf->Cell(12,4,$move['move'],'LTB',0,'L');
+		$pdf->Cell(12,4,getOr($move, 'move', ''),'LTB',0,'L');
 
 		if(isset($move['variation']) || isset($move['result'])) {
 			$pdf->SetFont('Arial','B',7);
@@ -52,7 +52,7 @@ function addMove($pdf, $key, $move, $next) {
 		$pdf->SetDrawColor(190);
 		$pdf->SetTextColor(0);
 		$pdf->SetFont('Arial','',10);
-		$pdf->Cell(12,4,$move['move'],'LTB',0,'L');
+		$pdf->Cell(12,4,getOr($move, 'move', ''),'LTB',0,'L');
 		
 		if(isset($move['variation']) || isset($move['result'])) {
 			$pdf->SetFont('Arial','B',7);
@@ -116,7 +116,7 @@ function addMoveString($pdf, $ply, $moves) {
 
 function addVariation($pdf, $key, $move, $game) {
 	$pdf->SetFont('Arial','B',9.5);
-	$pdf->Write(3.5,(floor($key/2)+1).(($key%2==0)? '. ' : '... ').$move['move'].' ');
+	$pdf->Write(3.5,(floor($key/2)+1).(($key%2==0)? '. ' : '... ').getOr($move, 'move', '').' ');
 	$pdf->SetFont('Arial','',9.5);
 	$pdf->Write(3.5,formatComment($key, $move, $game).' The best move was ');
 	$pdf->SetFont('Arial','B',9.5);
