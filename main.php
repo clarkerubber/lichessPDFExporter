@@ -129,7 +129,7 @@ function addVariation($pdf, $key, $move, $game) {
 
 function getUsername($id) {
 	if (isset($id)) {
-		$info = json_decode(file_get_contents('http://lichess.org/api/user/'.$id),true);
+		$info = json_decode(file_get_contents('http://en.lichess.org/api/user/'.$id),true);
 		if (isset($info['username'])){
 			return ( isset($info['title']) ? strtoupper($info['title']).' ' : '' ).$info['username'];
 		} else {
