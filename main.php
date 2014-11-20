@@ -417,7 +417,7 @@ function createPDF($game) {
 		if (!isset($game['analysis'][$key])) {
 			array_push($game['analysis'], array('move' => $move, 'result' => null));
 		} else {
-			$game['analysis']['key'] = array_merge($game['analysis'][$key], array('move' => $move, 'result' => null));Wa
+			$game['analysis'][$key] = array_merge($game['analysis'][$key], array('move' => $move, 'result' => null));Wa
 		}
 	}
 
