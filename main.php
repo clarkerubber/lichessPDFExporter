@@ -414,7 +414,11 @@ function createPDF($game) {
 	}
 
 	foreach ($movesList as $key => $move) {
-		array_push($game['analysis'], array('move' => $move, 'result' => null));
+		if (!isset($game['analysis'][$key])) {
+			array_push($game['analysis'], array('move' => $move, 'result' => null));
+		} else {
+			array_merge($game['analysis'][$key], array('move' => $move, 'result' => null));
+		}
 	}
 
 	// Images
